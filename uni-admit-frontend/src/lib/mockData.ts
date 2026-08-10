@@ -34,7 +34,7 @@ export const mockApplications: MockApplication[] = [
 
     status: "PENDING",
 
-    submittedAt: "2026-08-01T10:30:00Z",
+    submittedAt: "01/08/2026 10:30 AM",
 
     tenthPercentage: 91,
     twelfthPercentage: 88,
@@ -56,7 +56,7 @@ export const mockApplications: MockApplication[] = [
 
     status: "APPROVED",
 
-    submittedAt: "2026-07-29T09:00:00Z",
+    submittedAt: "29/07/2026 09:00 AM",
 
     tenthPercentage: 94,
     twelfthPercentage: 92,
@@ -78,7 +78,7 @@ export const mockApplications: MockApplication[] = [
 
     status: "REJECTED",
 
-    submittedAt: "2026-07-25T11:15:00Z",
+    submittedAt: "01/01/2026 10:30 AM",
 
     tenthPercentage: 78,
     twelfthPercentage: 74,
@@ -100,7 +100,7 @@ export const mockApplications: MockApplication[] = [
 
     status: "UNDER_REVIEW",
 
-    submittedAt: "2026-07-22T14:20:00Z",
+    submittedAt: "22/07/2026 02:20 PM",
 
     tenthPercentage: 89,
     twelfthPercentage: 86,

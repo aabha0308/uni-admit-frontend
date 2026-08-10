@@ -309,11 +309,9 @@ await new Promise((resolve) =>
           />
 
           <InfoItem
-            label="Submitted At"
-            value={new Date(
-              application.submittedAt
-            ).toLocaleString()}
-          />
+  label="Submitted At"
+  value={application.submittedAt}
+/>
 
         </div>
 

@@ -1,57 +1,66 @@
 import api from "@/lib/axios";
-
+import { API_ENDPOINTS } from "@/lib/constants";
 import {
-  ApplicationResponse,
-  ApplicationDetailResponse,
-  AnalyticsResponse,
-  StatusUpdateRequest,
+    AnalyticsResponse,
+    ApplicationDetailResponse,
+    ApplicationResponse,
+    StatusUpdateRequest,
 } from "@/types";
 
-const BASE = "/admin";
+class AdminService {
+    /**
+     * Get all applications
+     * GET /admin/applications
+     */
+    async getApplications(): Promise<ApplicationResponse[]> {
+        const { data } = await api.get<ApplicationResponse[]>(
+            API_ENDPOINTS.ADMIN.APPLICATIONS
+        );
 
-export const adminService = {
+        return data;
+    }
 
-  getApplications: async (): Promise<ApplicationResponse[]> => {
-    const response = await api.get<ApplicationResponse[]>(
-      `${BASE}/applications`
-    );
+    /**
+     * Get application details
+     * GET /admin/applications/{id}
+     */
+    async getApplicationDetails(
+        applicationId: string
+    ): Promise<ApplicationDetailResponse> {
+        const { data } = await api.get<ApplicationDetailResponse>(
+            API_ENDPOINTS.ADMIN.APPLICATION_DETAIL(applicationId)
+        );
 
-    return response.data;
-  },
+        return data;
+    }
 
-  getApplicationDetails: async (
-    id: string
-  ): Promise<ApplicationDetailResponse> => {
+    /**
+     * Review application
+     * PATCH /admin/applications/{id}/review
+     */
+    async reviewApplication(
+        applicationId: string,
+        request: StatusUpdateRequest
+    ): Promise<ApplicationResponse> {
+        const { data } = await api.patch<ApplicationResponse>(
+            API_ENDPOINTS.ADMIN.REVIEW_APPLICATION(applicationId),
+            request
+        );
 
-    const response =
-      await api.get<ApplicationDetailResponse>(
-        `${BASE}/applications/${id}`
-      );
+        return data;
+    }
 
-    return response.data;
-  },
+    /**
+     * Get analytics
+     * GET /admin/analytics
+     */
+    async getAnalytics(): Promise<AnalyticsResponse> {
+        const { data } = await api.get<AnalyticsResponse>(
+            API_ENDPOINTS.ADMIN.ANALYTICS
+        );
 
-  reviewApplication: async (
-    id: string,
-    payload: StatusUpdateRequest
-  ): Promise<ApplicationResponse> => {
+        return data;
+    }
+}
 
-    const response =
-      await api.patch<ApplicationResponse>(
-        `${BASE}/applications/${id}/review`,
-        payload
-      );
-
-    return response.data;
-  },
-
-  getAnalytics: async (): Promise<AnalyticsResponse> => {
-
-    const response =
-      await api.get<AnalyticsResponse>(
-        `${BASE}/analytics`
-      );
-
-    return response.data;
-  },
-};
+export const adminService = new AdminService();
