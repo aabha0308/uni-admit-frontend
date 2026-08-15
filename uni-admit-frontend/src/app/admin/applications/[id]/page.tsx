@@ -28,102 +28,8 @@ export default function ApplicationDetailsPage() {
   const [rejectionReason, setRejectionReason] = useState("");
 
   useEffect(() => {
-  loadMockApplication();
+  loadApplication();
 }, [applicationId]);
-
-const loadMockApplication = () => {
-  const mockApplications: Record<
-    string,
-    ApplicationDetailResponse
-  > = {
-    "APP-001": {
-      applicationId: "APP-001",
-      courseName: "Computer Science",
-      university: "Technical University of Munich",
-      intakeYear: 2026,
-      status: "PENDING",
-      rejectionReason: "",
-      adminComments: "",
-      submittedAt: "2026-08-01T10:30:00Z",
-
-      studentFirstName: "Aarav",
-      studentLastName: "Sharma",
-      studentPhone: "+91 9876543210",
-      studentCity: "Mumbai",
-
-      tenthPercentage: 91,
-      twelfthPercentage: 88,
-    },
-
-    "APP-002": {
-      applicationId: "APP-002",
-      courseName: "Data Science",
-      university: "RWTH Aachen University",
-      intakeYear: 2026,
-      status: "APPROVED",
-      rejectionReason: "",
-      adminComments: "Strong academic profile.",
-      submittedAt: "2026-07-29T09:15:00Z",
-
-      studentFirstName: "Priya",
-      studentLastName: "Mehta",
-      studentPhone: "+91 9876543211",
-      studentCity: "Pune",
-
-      tenthPercentage: 94,
-      twelfthPercentage: 92,
-    },
-
-    "APP-003": {
-      applicationId: "APP-003",
-      courseName: "Artificial Intelligence",
-      university: "University of Stuttgart",
-      intakeYear: 2026,
-      status: "REJECTED",
-      rejectionReason: "Academic requirements not met.",
-      adminComments: "",
-      submittedAt: "2026-07-25T14:20:00Z",
-
-      studentFirstName: "Rohan",
-      studentLastName: "Patel",
-      studentPhone: "+91 9876543212",
-      studentCity: "Ahmedabad",
-
-      tenthPercentage: 78,
-      twelfthPercentage: 74,
-    },
-
-    "APP-004": {
-      applicationId: "APP-004",
-      courseName: "Software Engineering",
-      university: "University of Hamburg",
-      intakeYear: 2026,
-      status: "UNDER_REVIEW",
-      rejectionReason: "",
-      adminComments: "Documents currently under review.",
-      submittedAt: "2026-07-22T11:45:00Z",
-
-      studentFirstName: "Ananya",
-      studentLastName: "Singh",
-      studentPhone: "+91 9876543213",
-      studentCity: "Delhi",
-
-      tenthPercentage: 89,
-      twelfthPercentage: 90,
-    },
-  };
-
-  const selected =
-    mockApplications[applicationId] ||
-    mockApplications["APP-001"];
-
-  setApplication(selected);
-
-  setAdminComments(selected.adminComments || "");
-  setRejectionReason(selected.rejectionReason || "");
-
-  setLoading(false);
-};
 
   const loadApplication = async () => {
     try {
@@ -134,6 +40,7 @@ const loadMockApplication = () => {
         await adminService.getApplicationDetails(applicationId);
 
       setApplication(data);
+      console.log("REAL APPLICATION FROM BACKEND:", data);
 
       setAdminComments(data.adminComments || "");
       setRejectionReason(data.rejectionReason || "");
@@ -167,15 +74,12 @@ const loadMockApplication = () => {
         adminComments,
       };
 
-    //   await adminService.reviewApplication(
-    //     application.applicationId,
-    //     payload
-    //   );
+      await adminService.reviewApplication(
+        application.applicationId,
+        payload
+      );
     console.log("Review payload:", payload);
 
-await new Promise((resolve) =>
-  setTimeout(resolve, 800)
-);
 
       alert(`Application ${status.toLowerCase()} successfully.`);
 
@@ -492,10 +396,10 @@ await new Promise((resolve) =>
 
           <button
   disabled={reviewing !== null}
-  onClick={() => reviewApplication("APPROVED")}
+  onClick={() => reviewApplication("ACCEPTED")}
   className="rounded-lg bg-green-600 px-6 py-3 font-medium text-white hover:bg-green-700 disabled:opacity-50"
 >
-  {reviewing === "APPROVED"
+  {reviewing === "ACCEPTED"
     ? "Approving..."
     : "Approve Application"}
 </button>
@@ -555,18 +459,21 @@ function StatusBadge({
   status: string;
 }) {
   const styles: Record<string, string> = {
-    PENDING:
-      "bg-yellow-100 text-yellow-800",
+  SUBMITTED:
+    "bg-yellow-100 text-yellow-800",
 
-    APPROVED:
-      "bg-green-100 text-green-800",
+  PENDING:
+    "bg-yellow-100 text-yellow-800",
 
-    REJECTED:
-      "bg-red-100 text-red-800",
+  ACCEPTED:
+    "bg-green-100 text-green-800",
 
-    UNDER_REVIEW:
-      "bg-blue-100 text-blue-800",
-  };
+  REJECTED:
+    "bg-red-100 text-red-800",
+
+  UNDER_REVIEW:
+    "bg-blue-100 text-blue-800",
+};
 
   return (
     <span
