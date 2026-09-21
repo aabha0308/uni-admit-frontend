@@ -6,10 +6,11 @@ import { Eye, Search } from "lucide-react";
 import axios from "axios";
 
 import { adminService } from "@/services/adminService";
-import { ApplicationResponse } from "@/types";
+import { ApplicationResponse, DocumentResponse } from "@/types";
 
 export default function ApplicationsPage() {
     const [applications, setApplications] = useState<ApplicationResponse[]>([]);
+
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("ALL");
 

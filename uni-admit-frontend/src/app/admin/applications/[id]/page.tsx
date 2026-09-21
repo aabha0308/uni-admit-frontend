@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import documentService from "@/services/documentService";
 import { adminService } from "@/services/adminService";
 import {
   ApplicationDetailResponse,
   StatusUpdateRequest,
+  DocumentResponse,
 } from "@/types";
 
 export default function ApplicationDetailsPage() {
@@ -16,6 +18,11 @@ export default function ApplicationDetailsPage() {
 
   const [application, setApplication] =
     useState<ApplicationDetailResponse | null>(null);
+
+    
+    const [documents, setDocuments] = useState<DocumentResponse[]>([]);
+    const [documentsLoading, setDocumentsLoading] = useState(true);
+    const [documentsError, setDocumentsError] = useState("");
 
   const [loading, setLoading] = useState(true);
 
@@ -29,28 +36,50 @@ export default function ApplicationDetailsPage() {
 
   useEffect(() => {
   loadApplication();
+  loadDocuments();
 }, [applicationId]);
 
   const loadApplication = async () => {
-    try {
-      setLoading(true);
-      setError("");
+  try {
+    setLoading(true);
+    setError("");
 
-      const data =
-        await adminService.getApplicationDetails(applicationId);
+    const data =
+      await adminService.getApplicationDetails(applicationId);
 
-      setApplication(data);
-      console.log("REAL APPLICATION FROM BACKEND:", data);
+    setApplication(data);
 
-      setAdminComments(data.adminComments || "");
-      setRejectionReason(data.rejectionReason || "");
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load application.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    console.log("REAL APPLICATION FROM BACKEND:", data);
+
+    setAdminComments(data.adminComments || "");
+    setRejectionReason(data.rejectionReason || "");
+
+  } catch (err) {
+    console.error("Failed to load application:", err);
+    setError("Failed to load application.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+const loadDocuments = async () => {
+  try {
+    setDocumentsLoading(true);
+    setDocumentsError("");
+
+    const data =
+      await documentService.getDocumentsByApplication(applicationId);
+
+    console.log("REAL DOCUMENTS FROM BACKEND:", data);
+
+    setDocuments(data);
+  } catch (err) {
+    console.error("Failed to load documents:", err);
+    setDocumentsError("Failed to load documents.");
+  } finally {
+    setDocumentsLoading(false);
+  }
+};
 
   const reviewApplication = async (status: string) => {
     if (!application) return;
@@ -248,6 +277,8 @@ export default function ApplicationDetailsPage() {
 
       {/* Documents Section */}
 
+    {/* Documents */}
+
 <section className="mb-6 rounded-xl bg-white p-6 shadow-sm">
 
   <div className="mb-5">
@@ -256,37 +287,38 @@ export default function ApplicationDetailsPage() {
     </h2>
 
     <p className="mt-1 text-sm text-slate-500">
-      Documents submitted by the student for verification.
+      Documents submitted by the student.
     </p>
   </div>
 
-  <div className="space-y-3">
-
-    <DocumentRow
-      name="10th Marksheet"
-      type="PDF"
-      status="VERIFIED"
-    />
-
-    <DocumentRow
-      name="12th Marksheet"
-      type="PDF"
-      status="VERIFIED"
-    />
-
-    <DocumentRow
-      name="Passport"
-      type="PDF"
-      status="PENDING"
-    />
-
-    <DocumentRow
-      name="Statement of Purpose"
-      type="PDF"
-      status="VERIFIED"
-    />
-
-  </div>
+  {documentsLoading ? (
+    <div className="rounded-lg border border-slate-200 p-6 text-center">
+      <p className="text-sm text-slate-500">
+        Loading documents...
+      </p>
+    </div>
+  ) : documentsError ? (
+    <div className="rounded-lg border border-red-200 bg-red-50 p-5">
+      <p className="text-sm text-red-600">
+        {documentsError}
+      </p>
+    </div>
+  ) : documents.length === 0 ? (
+    <div className="rounded-lg border border-slate-200 p-6 text-center">
+      <p className="text-sm text-slate-500">
+        No documents have been uploaded for this application.
+      </p>
+    </div>
+  ) : (
+    <div className="space-y-3">
+      {documents.map((document) => (
+        <DocumentRow
+          key={document.id}
+          document={document}
+        />
+      ))}
+    </div>
+  )}
 
 </section>
 
@@ -304,39 +336,11 @@ export default function ApplicationDetailsPage() {
     </p>
   </div>
 
+   <ApplicationTimeline
+  application={application}
+  documents={documents}
+/>
 
-  <div className="space-y-6">
-
-    <TimelineItem
-      title="Application Submitted"
-      description="Student submitted the admission application."
-      date="August 1, 2026"
-      completed
-    />
-
-    <TimelineItem
-      title="Documents Uploaded"
-      description="Required admission documents were uploaded."
-      date="August 1, 2026"
-      completed
-    />
-
-    <TimelineItem
-      title="Application Under Review"
-      description="Application was opened for administrative review."
-      date="August 2, 2026"
-      completed
-    />
-
-    <TimelineItem
-      title="Application Decision"
-      description="Waiting for administrator approval or rejection."
-      date="Pending"
-      completed={false}
-      last
-    />
-
-  </div>
 
 </section>
 
@@ -488,54 +492,77 @@ function StatusBadge({
 }
 
 function DocumentRow({
-  name,
-  type,
-  status,
+  document,
 }: {
-  name: string;
-  type: string;
-  status: string;
+  document: DocumentResponse;
 }) {
+  const handleView = () => {
+    if (!document.downloadUrl) {
+      alert("Download link is not available for this document.");
+      return;
+    }
+
+    window.open(
+      document.downloadUrl,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
+
+  const formattedDate = document.uploadedAt
+    ? new Date(document.uploadedAt).toLocaleString()
+    : "—";
+
   return (
-    <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4">
+    <div className="flex flex-col gap-4 rounded-lg border border-slate-200 p-4 md:flex-row md:items-center md:justify-between">
 
       <div className="flex items-center gap-4">
 
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100">
-          <span className="text-sm font-semibold text-slate-600">
-            PDF
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+          <span className="text-xs font-bold text-slate-600">
+            {document.contentType === "application/pdf"
+              ? "PDF"
+              : "FILE"}
           </span>
         </div>
 
         <div>
           <p className="font-medium text-slate-900">
-            {name}
+            {document.originalFileName}
           </p>
 
           <p className="mt-1 text-xs text-slate-500">
-            {type} document
+            {document.documentType}
+            {" • "}
+            {formatFileSize(document.fileSize)}
+          </p>
+
+          <p className="mt-1 text-xs text-slate-400">
+            Uploaded: {formattedDate}
           </p>
         </div>
 
       </div>
 
-
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
 
         <span
           className={`rounded-full px-3 py-1 text-xs font-medium ${
-            status === "VERIFIED"
+            document.status === "VERIFIED"
               ? "bg-green-100 text-green-700"
-              : "bg-yellow-100 text-yellow-700"
+              : document.status === "REJECTED"
+                ? "bg-red-100 text-red-700"
+                : "bg-yellow-100 text-yellow-700"
           }`}
         >
-          {status}
+          {document.status || "PENDING"}
         </span>
 
         <button
           type="button"
-          className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-          onClick={() => alert(`Opening ${name}`)}
+          onClick={handleView}
+          disabled={!document.downloadUrl}
+          className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
           View
         </button>
@@ -546,65 +573,179 @@ function DocumentRow({
   );
 }
 
+function formatFileSize(bytes: number) {
+  if (!bytes) return "Unknown size";
+
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  }
+
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function ApplicationTimeline({
+  application,
+  documents,
+}: {
+  application: ApplicationDetailResponse;
+  documents: DocumentResponse[];
+}) {
+  const status = application.status;
+
+  const submitted = Boolean(application.submittedAt);
+
+  const latestDocumentDate =
+    documents.length > 0
+      ? documents.reduce((latest, document) => {
+          if (!latest) return document.uploadedAt;
+
+          return new Date(document.uploadedAt).getTime() >
+            new Date(latest).getTime()
+            ? document.uploadedAt
+            : latest;
+        }, "")
+      : "";
+
+  const documentsUploaded = documents.length > 0;
+
+  const underReview =
+    status === "UNDER_REVIEW" ||
+    status === "ACCEPTED" ||
+    status === "REJECTED";
+
+  const decisionMade =
+    status === "ACCEPTED" ||
+    status === "REJECTED";
+
+  const timeline = [
+    {
+      title: "Application Submitted",
+      description: submitted
+        ? "Student submitted the admission application."
+        : "Application has not been submitted yet.",
+      date: application.submittedAt
+        ? formatDate(application.submittedAt)
+        : "Not available",
+      completed: submitted,
+    },
+
+    {
+      title: "Documents Uploaded",
+      description: documentsUploaded
+        ? `${documents.length} document${
+            documents.length === 1 ? "" : "s"
+          } uploaded by the student.`
+        : "No documents have been uploaded yet.",
+      date: latestDocumentDate
+        ? formatDate(latestDocumentDate)
+        : "Not available",
+      completed: documentsUploaded,
+    },
+
+    {
+      title: "Application Under Review",
+      description: underReview
+        ? "Application has entered the administrative review stage."
+        : "Application has not entered review yet.",
+      date: "Date not provided by backend",
+      completed: underReview,
+    },
+
+    {
+      title: "Application Decision",
+      description:
+        status === "ACCEPTED"
+          ? "Application was accepted by the administrator."
+          : status === "REJECTED"
+            ? "Application was rejected by the administrator."
+            : "Waiting for the administrator's decision.",
+      date: decisionMade
+  ? "Decision recorded"
+  : "Pending",
+      completed: decisionMade,
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {timeline.map((item, index) => (
+        <TimelineItem
+          key={item.title}
+          title={item.title}
+          description={item.description}
+          date={item.date}
+          completed={item.completed}
+          last={index === timeline.length - 1}
+        />
+      ))}
+    </div>
+  );
+}
+
+function formatDate(date: string) {
+  if (!date) return "Not available";
+
+  return new Date(date).toLocaleString();
+}
+
 function TimelineItem({
   title,
   description,
   date,
   completed,
-  last = false,
+  last,
 }: {
   title: string;
   description: string;
   date: string;
   completed: boolean;
-  last?: boolean;
+  last: boolean;
 }) {
   return (
     <div className="flex gap-4">
-
       {/* Timeline indicator */}
-
       <div className="flex flex-col items-center">
-
         <div
-          className={`flex h-9 w-9 items-center justify-center rounded-full ${
+          className={`flex h-8 w-8 items-center justify-center rounded-full ${
             completed
-              ? "bg-slate-900 text-white"
-              : "border-2 border-slate-300 bg-white text-slate-400"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 text-gray-500"
           }`}
         >
-          {completed ? "✓" : "•"}
+          {completed ? "✓" : "○"}
         </div>
 
         {!last && (
-          <div className="mt-2 h-10 w-px bg-slate-200" />
+          <div
+            className={`mt-2 h-full min-h-12 w-0.5 ${
+              completed ? "bg-blue-300" : "bg-gray-200"
+            }`}
+          />
         )}
-
       </div>
 
-
       {/* Timeline content */}
+      <div className="pb-6">
+        <h3
+          className={`font-semibold ${
+            completed ? "text-gray-900" : "text-gray-500"
+          }`}
+        >
+          {title}
+        </h3>
 
-      <div className="pb-4">
-
-        <div className="flex items-center gap-3">
-
-          <h3 className="font-medium text-slate-900">
-            {title}
-          </h3>
-
-          <span className="text-xs text-slate-400">
-            {date}
-          </span>
-
-        </div>
-
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-gray-500">
           {description}
         </p>
 
+        <p className="mt-1 text-xs text-gray-400">
+          {date}
+        </p>
       </div>
-
     </div>
   );
 }
