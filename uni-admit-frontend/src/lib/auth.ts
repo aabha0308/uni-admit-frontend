@@ -14,24 +14,18 @@ import { STORAGE_KEYS } from "./constants";
    ACCESS TOKEN
    ========================================================================== */
 
-/**
- * Save Access Token
- */
 export const setAccessToken = (token: string): void => {
+    if (typeof window === "undefined") return;
     localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
 };
 
-/**
- * Get Access Token
- */
 export const getAccessToken = (): string | null => {
+    if (typeof window === "undefined") return null;
     return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
 };
 
-/**
- * Remove Access Token
- */
 export const removeAccessToken = (): void => {
+    if (typeof window === "undefined") return;
     localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
 };
 
@@ -39,24 +33,18 @@ export const removeAccessToken = (): void => {
    REFRESH TOKEN
    ========================================================================== */
 
-/**
- * Save Refresh Token
- */
 export const setRefreshToken = (token: string): void => {
+    if (typeof window === "undefined") return;
     localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, token);
 };
 
-/**
- * Get Refresh Token
- */
 export const getRefreshToken = (): string | null => {
+    if (typeof window === "undefined") return null;
     return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
 };
 
-/**
- * Remove Refresh Token
- */
 export const removeRefreshToken = (): void => {
+    if (typeof window === "undefined") return;
     localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
 };
 
@@ -64,9 +52,6 @@ export const removeRefreshToken = (): void => {
    TOKEN MANAGEMENT
    ========================================================================== */
 
-/**
- * Save Authentication Tokens
- */
 export const saveTokens = (
     accessToken: string,
     refreshToken: string
@@ -75,24 +60,15 @@ export const saveTokens = (
     setRefreshToken(refreshToken);
 };
 
-/**
- * Remove All Authentication Tokens
- */
 export const clearTokens = (): void => {
     removeAccessToken();
     removeRefreshToken();
 };
 
-/**
- * Check Authentication Status
- */
 export const isAuthenticated = (): boolean => {
     return !!getAccessToken();
 };
 
-/**
- * Logout User
- */
 export const logout = (): void => {
     clearTokens();
 };

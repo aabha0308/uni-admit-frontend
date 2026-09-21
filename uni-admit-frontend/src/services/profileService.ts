@@ -1,10 +1,9 @@
 import api from "@/lib/axios";
+import { API_ENDPOINTS } from "@/lib/constants";
 import {
     ProfileRequest,
     ProfileResponse,
 } from "@/types";
-
-const PROFILE_BASE = "/profile";
 
 const profileService = {
     /**
@@ -15,7 +14,7 @@ const profileService = {
         request: ProfileRequest
     ): Promise<ProfileResponse> {
         const { data } = await api.post<ProfileResponse>(
-            PROFILE_BASE,
+            API_ENDPOINTS.PROFILE.CREATE,
             request
         );
 
@@ -28,7 +27,7 @@ const profileService = {
      */
     async getMyProfile(): Promise<ProfileResponse> {
         const { data } = await api.get<ProfileResponse>(
-            `${PROFILE_BASE}/me`
+            API_ENDPOINTS.PROFILE.GET_ME
         );
 
         return data;
@@ -42,7 +41,7 @@ const profileService = {
         profileId: string
     ): Promise<ProfileResponse> {
         const { data } = await api.get<ProfileResponse>(
-            `${PROFILE_BASE}/${profileId}`
+            API_ENDPOINTS.PROFILE.GET_BY_ID(profileId)
         );
 
         return data;
@@ -56,7 +55,7 @@ const profileService = {
         request: ProfileRequest
     ): Promise<ProfileResponse> {
         const { data } = await api.put<ProfileResponse>(
-            `${PROFILE_BASE}/me`,
+            API_ENDPOINTS.PROFILE.UPDATE_ME,
             request
         );
 

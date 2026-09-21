@@ -1,81 +1,42 @@
 import api from "@/lib/axios";
-import {
+
+import { APPLICATION_ENDPOINTS } from "@/lib/constants";
+
+import type {
     ApplicationRequest,
     ApplicationResponse,
-    StatusUpdateRequest,
-} from "@/types";
+} from "@/types/application";
 
-const APPLICATION_BASE = "/application";
-
-const applicationService = {
-    /**
-     * Submit Admission Application
-     * POST /application
-     */
-    async submitApplication(
-        request: ApplicationRequest
-    ): Promise<ApplicationResponse> {
-        const { data } = await api.post<ApplicationResponse>(
-            APPLICATION_BASE,
-            request
-        );
-
-        return data;
-    },
-
-    /**
-     * Get Logged-in Student Applications
-     * GET /application/my
-     */
+export const applicationService = {
     async getMyApplications(): Promise<ApplicationResponse[]> {
-        const { data } = await api.get<ApplicationResponse[]>(
-            `${APPLICATION_BASE}/my`
-        );
+        const { data } =
+            await api.get<ApplicationResponse[]>(
+                APPLICATION_ENDPOINTS.MY_APPLICATIONS
+            );
 
         return data;
     },
 
-    /**
-     * Get Single Application
-     * GET /application/{applicationId}
-     */
-    async getApplication(
+    async getApplicationById(
         applicationId: string
     ): Promise<ApplicationResponse> {
-        const { data } = await api.get<ApplicationResponse>(
-            `${APPLICATION_BASE}/${applicationId}`
-        );
+        const { data } =
+            await api.get<ApplicationResponse>(
+                APPLICATION_ENDPOINTS.BY_ID(applicationId)
+            );
 
         return data;
     },
 
-    /**
-     * Get All Applications (Admin)
-     * GET /application
-     */
-    async getAllApplications(): Promise<ApplicationResponse[]> {
-        const { data } = await api.get<ApplicationResponse[]>(
-            APPLICATION_BASE
-        );
-
-        return data;
-    },
-
-    /**
-     * Review / Update Application Status (Admin)
-     * PATCH /application/{applicationId}/status
-     */
-    async updateApplicationStatus(
-        applicationId: string,
-        request: StatusUpdateRequest
+    async submitApplication(
+        payload: ApplicationRequest
     ): Promise<ApplicationResponse> {
-        const { data } = await api.patch<ApplicationResponse>(
-            `${APPLICATION_BASE}/${applicationId}/status`,
-            request
-        );
+        const { data } =
+            await api.post<ApplicationResponse>(
+                APPLICATION_ENDPOINTS.SUBMIT,
+                payload
+            );
 
         return data;
     },
 };
-
-export default applicationService;

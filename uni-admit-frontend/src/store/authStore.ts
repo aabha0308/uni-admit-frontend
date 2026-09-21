@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { jwtDecode } from "jwt-decode";
 
 import authService from "@/services/authService";
+
 import {
     clearTokens,
     getAccessToken,
@@ -13,6 +14,8 @@ import {
     LoginRequest,
     RegisterRequest,
 } from "@/types";
+
+import { useProfileStore } from "@/store/profileStore";
 
 interface JwtPayload {
     sub: string;
@@ -47,6 +50,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         const token = getAccessToken();
 
         if (!token) {
+            useProfileStore.getState().clearProfile();
             return;
         }
 
@@ -62,6 +66,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         } catch {
             clearTokens();
 
+            useProfileStore.getState().clearProfile();
+
             set({
                 isAuthenticated: false,
                 userId: null,
@@ -74,7 +80,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     login: async (request) => {
         const response = await authService.login(request);
 
-        const payload = jwtDecode<JwtPayload>(response.accessToken);
+        const payload = jwtDecode<JwtPayload>(
+            response.accessToken
+        );
+
+        useProfileStore.getState().clearProfile();
 
         set({
             isAuthenticated: true,
@@ -84,17 +94,12 @@ export const useAuthStore = create<AuthState>((set) => ({
         });
     },
 
+    /**
+     * Registration only creates the account.
+     * User can login afterwards.
+     */
     register: async (request) => {
-        const response = await authService.register(request);
-
-        const payload = jwtDecode<JwtPayload>(response.accessToken);
-
-        set({
-            isAuthenticated: true,
-            userId: payload.userId,
-            email: payload.sub,
-            role: payload.role,
-        });
+        await authService.register(request);
     },
 
     logout: async () => {
@@ -102,6 +107,8 @@ export const useAuthStore = create<AuthState>((set) => ({
             await authService.logout();
         } finally {
             clearTokens();
+
+            useProfileStore.getState().clearProfile();
 
             set({
                 isAuthenticated: false,

@@ -1,12 +1,18 @@
 import api from "@/lib/axios";
-import { DocumentResponse } from "@/types";
+import type { DocumentResponse } from "@/types";
 
 const DOCUMENT_BASE = "/docs";
 
 const documentService = {
     /**
-     * Upload Document
+     * Upload document
      * POST /docs/upload
+     *
+     * Backend expects:
+     * multipart/form-data
+     * - applicationId
+     * - documentType
+     * - file
      */
     async uploadDocument(
         applicationId: string,
@@ -21,19 +27,13 @@ const documentService = {
 
         const { data } = await api.post<DocumentResponse>(
             `${DOCUMENT_BASE}/upload`,
-            formData,
-            {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            }
+            formData
         );
 
         return data;
     },
 
     /**
-     * Get Document By ID
      * GET /docs/{documentId}
      */
     async getDocument(
@@ -47,7 +47,6 @@ const documentService = {
     },
 
     /**
-     * Get Documents For Application
      * GET /docs/application/{applicationId}
      */
     async getDocumentsByApplication(
@@ -61,7 +60,6 @@ const documentService = {
     },
 
     /**
-     * Get Logged-in Student Documents
      * GET /docs/my
      */
     async getMyDocuments(): Promise<DocumentResponse[]> {
@@ -73,7 +71,6 @@ const documentService = {
     },
 
     /**
-     * Delete Document
      * DELETE /docs/{documentId}
      */
     async deleteDocument(

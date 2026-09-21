@@ -1,11 +1,13 @@
 import api from "@/lib/axios";
 import { API_ENDPOINTS } from "@/lib/constants";
+
 import {
     AuthResponse,
     LoginRequest,
     RefreshRequest,
     RegisterRequest,
 } from "@/types";
+
 import {
     clearTokens,
     getRefreshToken,
@@ -24,8 +26,14 @@ class AuthService {
             request
         );
 
-        setAccessToken(data.accessToken);
-        setRefreshToken(data.refreshToken);
+        // Store tokens if registration returns them.
+        if (data.accessToken) {
+            setAccessToken(data.accessToken);
+        }
+
+        if (data.refreshToken) {
+            setRefreshToken(data.refreshToken);
+        }
 
         return data;
     }
@@ -66,7 +74,6 @@ class AuthService {
             request
         );
 
-        // Backend rotates refresh token
         setAccessToken(data.accessToken);
         setRefreshToken(data.refreshToken);
 
@@ -80,15 +87,20 @@ class AuthService {
     async logout(): Promise<void> {
         const refreshToken = getRefreshToken();
 
-        if (refreshToken) {
-            const request: RefreshRequest = {
-                refreshToken,
-            };
+        try {
+            if (refreshToken) {
+                const request: RefreshRequest = {
+                    refreshToken,
+                };
 
-            await api.post(API_ENDPOINTS.AUTH.LOGOUT, request);
+                await api.post(
+                    API_ENDPOINTS.AUTH.LOGOUT,
+                    request
+                );
+            }
+        } finally {
+            clearTokens();
         }
-
-        clearTokens();
     }
 
     /**

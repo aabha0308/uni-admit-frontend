@@ -15,6 +15,8 @@
 /**
  * Universally Unique Identifier (UUID)
  */
+
+
 export type UUID = string;
 
 /**
@@ -147,7 +149,7 @@ export interface ApplicationResponse {
 
 /**
  * Document Response
- * Returned after a successful document upload or retrieval.
+ * Returned after a successful documents upload or retrieval.
  */
 export interface DocumentResponse {
     id: UUID;
@@ -204,3 +206,5 @@ export interface StatusUpdateRequest {
     reason: string;
     adminComments: string;
 }
+
+export * from './application';

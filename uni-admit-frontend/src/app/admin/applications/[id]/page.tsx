@@ -81,45 +81,46 @@ const loadDocuments = async () => {
   }
 };
 
-  const reviewApplication = async (status: string) => {
-    if (!application) return;
-    if (
-  status === "REJECTED" &&
-  !rejectionReason.trim()
-) {
-  alert("Please provide a rejection reason.");
-  return;
-}
+const reviewApplication = async (status: string) => {
+  if (!application) return;
 
-    try {
-      setReviewing(status);
+  if (
+    status === "REJECTED" &&
+    !rejectionReason.trim()
+  ) {
+    alert("Please provide a rejection reason.");
+    return;
+  }
 
-      const payload: StatusUpdateRequest = {
-        newStatus: status,
-        reason:
-          status === "REJECTED"
-            ? rejectionReason
-            : "",
-        adminComments,
-      };
+  try {
+    setReviewing(status);
 
-      await adminService.reviewApplication(
-        application.applicationId,
-        payload
-      );
+    const payload: StatusUpdateRequest = {
+      newStatus: status,
+      reason:
+        status === "REJECTED"
+          ? rejectionReason
+          : "",
+      adminComments,
+    };
+
+    await adminService.reviewApplication(
+      application.applicationId,
+      payload
+    );
+
     console.log("Review payload:", payload);
 
+    alert(`Application ${status.toLowerCase()} successfully.`);
 
-      alert(`Application ${status.toLowerCase()} successfully.`);
-
-      router.push("/admin/applications");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to review application.");
-    } finally {
-      setReviewing(null);
-    }
-  };
+    router.push("/admin/applications");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to review application.");
+  } finally {
+    setReviewing(null);
+  }
+};
 
   if (loading) {
     return (
@@ -393,33 +394,50 @@ const loadDocuments = async () => {
 
         </div>
 
+       {/* Buttons */}
 
-        {/* Buttons */}
+<div className="flex flex-wrap gap-4">
 
-        <div className="flex gap-4">
+  {/* SUBMITTED → UNDER_REVIEW */}
+  {application.status === "SUBMITTED" && (
+    <button
+      disabled={reviewing !== null}
+      onClick={() => reviewApplication("UNDER_REVIEW")}
+      className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+    >
+      {reviewing === "UNDER_REVIEW"
+        ? "Starting Review..."
+        : "Start Review"}
+    </button>
+  )}
 
-          <button
-  disabled={reviewing !== null}
-  onClick={() => reviewApplication("ACCEPTED")}
-  className="rounded-lg bg-green-600 px-6 py-3 font-medium text-white hover:bg-green-700 disabled:opacity-50"
->
-  {reviewing === "ACCEPTED"
-    ? "Approving..."
-    : "Approve Application"}
-</button>
+  {/* UNDER_REVIEW → ACCEPTED */}
+  {application.status === "UNDER_REVIEW" && (
+    <button
+      disabled={reviewing !== null}
+      onClick={() => reviewApplication("ACCEPTED")}
+      className="rounded-lg bg-green-600 px-6 py-3 font-medium text-white hover:bg-green-700 disabled:opacity-50"
+    >
+      {reviewing === "ACCEPTED"
+        ? "Approving..."
+        : "Approve Application"}
+    </button>
+  )}
 
+  {/* UNDER_REVIEW → REJECTED */}
+  {application.status === "UNDER_REVIEW" && (
+    <button
+      disabled={reviewing !== null}
+      onClick={() => reviewApplication("REJECTED")}
+      className="rounded-lg bg-red-600 px-6 py-3 font-medium text-white hover:bg-red-700 disabled:opacity-50"
+    >
+      {reviewing === "REJECTED"
+        ? "Rejecting..."
+        : "Reject Application"}
+    </button>
+  )}
 
-         <button
-  disabled={reviewing !== null}
-  onClick={() => reviewApplication("REJECTED")}
-  className="rounded-lg bg-red-600 px-6 py-3 font-medium text-white hover:bg-red-700 disabled:opacity-50"
->
-  {reviewing === "REJECTED"
-    ? "Rejecting..."
-    : "Reject Application"}
-</button>
-
-        </div>
+</div>
 
       </section>
 
