@@ -1,19 +1,26 @@
+
 "use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   FileText,
   Clock3,
   CheckCircle2,
   XCircle,
   ArrowRight,
+  LogOut,
 } from "lucide-react";
 
 import { adminService } from "@/services/adminService";
 import { AnalyticsResponse } from "@/types";
+import { useAuthStore } from "@/store/authStore";
 
 export default function AdminDashboard() {
+  const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
+
   const [analytics, setAnalytics] = useState<AnalyticsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -33,6 +40,14 @@ export default function AdminDashboard() {
 
     fetchAnalytics();
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } finally {
+      router.push("/");
+    }
+  };
 
   const totalApplications = analytics?.totalApplications ?? 0;
 
@@ -85,18 +100,30 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8">
       {/* Page heading */}
-      <div>
-        <p className="text-sm font-semibold uppercase tracking-wider text-indigo-600">
-          Admin Dashboard
-        </p>
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-wider text-indigo-600">
+            Admin Dashboard
+          </p>
 
-        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
-          Dashboard
-        </h1>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
+            Dashboard
+          </h1>
 
-        <p className="mt-2 text-slate-500">
-          Overview of the Uni Admit admission system.
-        </p>
+          <p className="mt-2 text-slate-500">
+            Overview of the Uni Admit admission system.
+          </p>
+        </div>
+
+        {/* Logout */}
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-rose-600"
+        >
+          <LogOut className="h-4 w-4" />
+          Logout
+        </button>
       </div>
 
       {/* Error */}

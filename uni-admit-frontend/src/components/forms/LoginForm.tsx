@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, Lock, Loader2, AlertCircle, GraduationCap } from "lucide-react";
+import Link from "next/link";
 
 import { loginSchema } from "@/validations/authSchemas";
 import { LoginRequest } from "@/types";
@@ -40,16 +41,26 @@ export default function LoginForm() {
             } else {
                 router.push("/student");
             }
-        } catch (err: any) {
-            setServerError(
-                err?.response?.data?.detail ??
-                err?.response?.data?.message ??
-                err?.response?.data?.error ??
-                "Invalid email or password."
-            );
-        } finally {
-            setLoading(false);
-        }
+        } catch (err: unknown) {
+             const error = err as {
+        response?: {
+            data?: {
+                detail?: string;
+                message?: string;
+                error?: string;
+            };
+        };
+    };
+
+    setServerError(
+        error.response?.data?.detail ??
+        error.response?.data?.message ??
+        error.response?.data?.error ??
+        "Invalid email or password."
+    );
+} finally{
+    setLoading(false);
+}
     }
 
     return (
@@ -131,6 +142,16 @@ export default function LoginForm() {
                     )}
                 </Button>
             </form>
+
+            <div className="mt-6 border-t border-slate-100 pt-4 text-center text-xs text-slate-500">
+    Dont have a student account?{" "}
+    <Link
+        href="/register"
+        className="font-semibold text-slate-900 hover:underline"
+    >
+        Register
+    </Link>
+</div>
         </div>
     );
 }

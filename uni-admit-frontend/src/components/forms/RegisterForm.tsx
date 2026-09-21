@@ -37,14 +37,24 @@ export default function RegisterForm() {
 
             reset();
             router.push("/login");
-        } catch (err: any) {
-            setServerError(
-                err?.response?.data?.detail ??
-                err?.response?.data?.message ??
-                err?.response?.data?.error ??
-                "Registration failed. Please try again."
-            );
-        } finally {
+        } catch (err: unknown) {
+    const error = err as {
+        response?: {
+            data?: {
+                detail?: string;
+                message?: string;
+                error?: string;
+            };
+        };
+    };
+
+    setServerError(
+        error.response?.data?.detail ??
+        error.response?.data?.message ??
+        error.response?.data?.error ??
+        "Registration failed. Please try again."
+    );
+} finally {
             setLoading(false);
         }
     }

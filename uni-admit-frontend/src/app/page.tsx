@@ -1,128 +1,121 @@
+"use client";
+
 import Link from "next/link";
 import {
     GraduationCap,
-    ArrowRight,
     ShieldCheck,
-    UserCheck,
-    FileText,
+    ArrowRight,
+    UserPlus,
 } from "lucide-react";
 
-export default function Home() {
+export default function HomePage() {
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
-            {/* Navigation Bar */}
-            <header className="border-b border-slate-200 bg-white">
-                <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-sm">
-                            <GraduationCap className="h-5 w-5" />
+        <main className="min-h-screen bg-slate-50 px-6 py-12">
+            <div className="mx-auto flex min-h-[85vh] max-w-5xl flex-col justify-center">
+
+                {/* Header */}
+                <div className="mb-12 text-center">
+                    <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-lg">
+                        <GraduationCap className="h-8 w-8" />
+                    </div>
+
+                    <h1 className="text-4xl font-bold tracking-tight text-slate-900">
+                        Welcome to Uni Admit
+                    </h1>
+
+                    <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-500">
+                        Intelligent College Admission Portal
+                    </p>
+
+                    <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+                        Select your portal to continue with the admission
+                        management system.
+                    </p>
+                </div>
+
+                {/* Portal Cards */}
+                <div className="grid gap-6 md:grid-cols-2">
+
+                    {/* Student Portal */}
+                    <div className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-md">
+                        <div className="flex items-start justify-between">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50">
+                                <GraduationCap className="h-6 w-6 text-indigo-600" />
+                            </div>
+
+                            <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-600">
+                                Student
+                            </span>
                         </div>
-                        <span className="font-bold text-slate-900 text-lg tracking-tight">
-                            Uni Admit
-                        </span>
+
+                        <h2 className="mt-6 text-2xl font-semibold text-slate-900">
+                            Student Portal
+                        </h2>
+
+                        <p className="mt-2 text-sm leading-6 text-slate-500">
+                            Apply for admission, complete your profile,
+                            upload documents, and track your application
+                            status.
+                        </p>
+
+                        <div className="mt-7 flex flex-col gap-3">
+                            <Link
+                                href="/login?role=student"
+                                className="flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                            >
+                                Login as Student
+                                <ArrowRight className="h-4 w-4" />
+                            </Link>
+
+                            <Link
+                                href="/register"
+                                className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                            >
+                                <UserPlus className="h-4 w-4" />
+                                Create Student Account
+                            </Link>
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <Link
-                            href="/login"
-                            className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
-                        >
-                            Sign In
-                        </Link>
+                    {/* Admin Portal */}
+                    <div className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-md">
+                        <div className="flex items-start justify-between">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50">
+                                <ShieldCheck className="h-6 w-6 text-emerald-600" />
+                            </div>
 
-                        <Link
-                            href="/register"
-                            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition-colors shadow-sm"
-                        >
-                            Get Started
-                        </Link>
+                            <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-600">
+                                Administration
+                            </span>
+                        </div>
+
+                        <h2 className="mt-6 text-2xl font-semibold text-slate-900">
+                            Admin Portal
+                        </h2>
+
+                        <p className="mt-2 text-sm leading-6 text-slate-500">
+                            Review applications, verify student documents,
+                            manage admission decisions, and view analytics.
+                        </p>
+
+                        <div className="mt-7">
+                            <Link
+                                href="/login?role=admin"
+                                className="flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                            >
+                                Login as Admin
+                                <ArrowRight className="h-4 w-4" />
+                            </Link>
+                        </div>
                     </div>
                 </div>
-            </header>
 
-            {/* Hero Section */}
-            <main className="max-w-5xl mx-auto px-6 py-20 text-center flex-1 flex flex-col items-center justify-center">
-                <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm mb-6">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
-                    <span>University Admission System</span>
-                </div>
-
-                <h1 className="text-4xl sm:text-6xl font-extrabold text-slate-900 tracking-tight max-w-3xl">
-                    Streamline Your University Admission Journey
-                </h1>
-
-                <p className="mt-4 text-lg text-slate-600 max-w-2xl">
-                    Apply to degree programs, track status updates in real-time,
-                    upload required documents, and manage your student profile
-                    seamlessly.
+                {/* Footer */}
+                <p className="mt-10 text-center text-xs text-slate-400">
+                    Uni Admit · Intelligent Microservices-Based Admission
+                    Platform
                 </p>
-
-                <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
-                    <Link
-                        href="/student"
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 py-3.5 text-sm font-semibold text-white shadow-md hover:bg-slate-800 transition-colors"
-                    >
-                        Go to Student Portal
-                        <ArrowRight className="h-4 w-4" />
-                    </Link>
-
-                    <Link
-                        href="/login"
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-slate-200 px-6 py-3.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
-                    >
-                        Sign In
-                    </Link>
-                </div>
-
-                {/* Quick Features */}
-                <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 text-left w-full">
-                    <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <FileText className="h-8 w-8 text-indigo-600 mb-3" />
-                        <h3 className="font-semibold text-slate-900">
-                            Easy Applications
-                        </h3>
-                        <p className="mt-1 text-xs text-slate-500">
-                            Submit and track degree program applications with
-                            automated workflow statuses.
-                        </p>
-                    </div>
-
-                    <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <UserCheck className="h-8 w-8 text-indigo-600 mb-3" />
-                        <h3 className="font-semibold text-slate-900">
-                            Profile Management
-                        </h3>
-                        <p className="mt-1 text-xs text-slate-500">
-                            Keep your academic background, contact details, and
-                            credentials up to date.
-                        </p>
-                    </div>
-
-                    <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <ShieldCheck className="h-8 w-8 text-indigo-600 mb-3" />
-                        <h3 className="font-semibold text-slate-900">
-                            Document Uploads
-                        </h3>
-                        <p className="mt-1 text-xs text-slate-500">
-                            Securely attach required transcripts and identity
-                            documents for review.
-                        </p>
-                    </div>
-                </div>
-            </main>
-
-            {/* Footer */}
-            <footer className="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
-                <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-                    <p>
-                        © {new Date().getFullYear()} Uni Admit Portal. All
-                        rights reserved.
-                    </p>
-                    <p className="font-medium text-slate-700">
-                        Enterprise Admission Portal
-                    </p>
-                </div>
-            </footer>
-        </div>
+            </div>
+        </main>
     );
 }
